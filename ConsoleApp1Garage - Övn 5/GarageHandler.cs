@@ -9,17 +9,23 @@ namespace ConsoleApp1Garage___Övn_5
     internal class GarageHandler
     {
         private Garage<Vehicle> garage;
-        private string[] types = new string[12];
 
-        internal GarageHandler()
+        private uint garageCapasity;
+
+        public uint GarageCapacity
         {
-            garage = new Garage<Vehicle>(10);
+            get { return garageCapasity; }
         }
 
-        internal void Populate()
+        internal GarageHandler(uint NrOfPlaces)
         {
-            InjectData();
-            CreateTypesList();
+            garage = new Garage<Vehicle>(NrOfPlaces);
+            garageCapasity = NrOfPlaces;
+        }
+
+        internal uint Populate(uint nrOfVehicles)
+        {
+            return InjectRandomVehicles(nrOfVehicles);
         }
 
         internal bool AddCar(string RegNum, uint NrOfwheels, string FuelType, ConsoleColor colour = ConsoleColor.Black)
@@ -28,7 +34,7 @@ namespace ConsoleApp1Garage___Övn_5
             Car car = new Car(RegNum.ToUpper(), NrOfwheels, FuelType);
             car.Colour = colour;
 
-            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, car))
+            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, car.GetType().Name))
                 success = garage.AddVehicle(car);
 
             return success;
@@ -40,44 +46,44 @@ namespace ConsoleApp1Garage___Övn_5
             Motorcycle mc = new Motorcycle(RegNum, NrOfwheels, CylinderVolume);
             mc.Colour = colour;
 
-            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, mc))
+            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, mc.GetType().Name))
                 success = garage.AddVehicle(mc);
 
             return success;
         }
 
-        internal bool Bus(string RegNum, uint NrOfwheels, uint NrOfSeats, ConsoleColor colour = ConsoleColor.Black)
+        internal bool AddBus(string RegNum, uint NrOfwheels, uint NrOfSeats, ConsoleColor colour = ConsoleColor.Black)
         {
             bool success = false;
             Bus bus = new Bus(RegNum, NrOfwheels, NrOfSeats);
             bus.Colour = colour;
 
-            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, bus))
+            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, bus.GetType().Name))
                 success = garage.AddVehicle(bus);
 
             return success;
         }
 
-        internal bool Boat(string RegNum, uint NrOfwheels, double Lenght, ConsoleColor colour = ConsoleColor.Black)
+        internal bool AddBoat(string RegNum, uint NrOfwheels, double Lenght, ConsoleColor colour = ConsoleColor.Black)
         {
             bool success = false;
             Boat boat = new Boat(RegNum, NrOfwheels, Lenght);
             boat.Colour = colour;
 
-            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, boat))
+            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, boat.GetType().Name))
                 success = garage.AddVehicle(boat);
 
             return success;
         }
 
-        internal bool Airplane(string RegNum, uint NrOfwheels, uint NrOfEngines, ConsoleColor colour = ConsoleColor.Black)
+        internal bool AddAirplane(string RegNum, uint NrOfwheels, uint NrOfEngines, ConsoleColor colour = ConsoleColor.Black)
         {
             bool success = false;
-            Boat boat = new Boat(RegNum, NrOfwheels, NrOfEngines);
-            boat.Colour = colour;
+            Airplane airplane = new Airplane(RegNum, NrOfwheels, NrOfEngines);
+            airplane.Colour = colour;
 
-            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, boat))
-                success = garage.AddVehicle(boat);
+            if (ValidateRegNum(RegNum) && ValidateNrOfWheels(NrOfwheels, airplane.GetType().Name))
+                success = garage.AddVehicle(airplane);
 
             return success;
         }
@@ -89,49 +95,44 @@ namespace ConsoleApp1Garage___Övn_5
             return result;
         }
 
-        internal bool RemoveVehicle(string RegNum)
-        {
-            bool result;
-
-            Vehicle? vehicle = FindVehicle(RegNum);
-            result = garage.RemoveVehicle(vehicle!);
-
-            return result;
-        }
-
         internal Vehicle? FindVehicle(string RegNum)
         {
             RegNum = RegNum.ToUpper();
-            if(ValidateRegNum(RegNum))
-                foreach (var v in garage)
-                    if(v.RegNum == RegNum) return v;
+            foreach (var v in garage)
+                if(v.RegNum == RegNum) return v;
 
             return null;
         }
 
         internal Vehicle[] FindVehicles(string VehicleType, string NrOfWheels, string Colour)
         {
-            var vehicles = garage.Where(v => v.GetType().Name == VehicleType);
+            IEnumerable<Vehicle> vehicles = garage;
+            if(VehicleType != "")
+                vehicles = vehicles.Where(v => v.GetType().Name == VehicleType);
 
             uint nrOfWheels;
             if(uint.TryParse(NrOfWheels, out nrOfWheels))
                 vehicles = vehicles.Where(v => v.NrOfwheels == nrOfWheels);
 
-            ConsoleColor myColour;
-           
-            for (uint i = 0; i < 16; i++)
-            {
-                myColour = (ConsoleColor)i;
-                if(myColour.ToString() == Colour)
-                    vehicles = vehicles.Where(v => v.NrOfwheels == nrOfWheels);
-            }
+            ConsoleColor cColour = ConsoleColor.Black;
+            bool colourOk = ValiateColour(Colour, ref cColour);
+            if(colourOk)
+                vehicles = vehicles.Where(v => v.Colour == cColour);
 
-            //uint size = sizeof(ConsoleColor);
-            //var vehicles = vehicles.Where(v => v.Colour == "Red");
-            //var vehicles2 = garage.Where(v => v is Car);
+            //for (uint i = 0; i < 16; i++)
+            //{
+            //    myColour = (ConsoleColor)i;
+            //    if (myColour.ToString() == Colour)
+            //    {
+            //        vehicles = vehicles.Where(v => v.Colour == myColour);
+            //        break;
+            //    }
+            //}
 
             return vehicles.ToArray();
         }
+
+        internal uint CountVehicles() => (uint)garage.Count();
 
         internal (Type, uint)[] ListNrByType()
         {
@@ -139,115 +140,72 @@ namespace ConsoleApp1Garage___Övn_5
 
             var myarray = new (Type, uint)[vehicleTypes.Count()];
 
-            uint nrOfType = 0; uint i = 0;
+            uint amount = 0; uint i = 0;
             foreach (var vType in vehicleTypes)
             {
-                nrOfType = (uint)garage.Where(v => v.GetType() == vType).Count();
-                myarray[i++] = (vType, nrOfType);
+                amount = (uint)garage.Where(v => v.GetType() == vType).Count();
+                myarray[i++] = (vType, amount);
             }
 
             return myarray;
-
-            //(Type, uint) typeCount;
-            //typeCount = (vType, nrOfType);
-            //myarray[i++] = typeCount;
-            // var vehicleTypes = garage.Select(v => v.GetType().Name).Distinct().ToArray();
-            // (double, int) t1 = (4.5, 3);
-
-
-            //CreateTypesList();
-
-            //string s = "";
-            //foreach(var type in types)
-            //{
-            //    if(type != null)
-            //    {
-            //        uint count = 0;
-            //        foreach(var v in garage)
-            //            if(v.GetType().Name == type) count++;
-
-            //        s += $"{type}:\t{count}";
-            //    }
-            //}
-
-            //return s;
-
-            // var res = garage.Select(v => v.GetType().Name).Distinct().ToArray();
         }
 
-        internal string ListAll()
-        {
-            string s = "";
-            foreach (var v in garage)
-                s += $"Reg: {v.RegNum}\tNrOfWheels: {v.NrOfwheels}\tColour: {v.Colour}\tType: {v.GetType().Name}\n";
-
-            return s;
+        internal Vehicle[] ListAll() 
+        {  
+            return garage.ToArray();
         }
 
-        private void CreateTypesList()
+        private uint InjectRandomVehicles(uint NrOfVehicles)
         {
-            foreach (var v in garage)
+            var r = new Random();
+            uint cnt = 0;
+
+            for (uint i = 0; i < NrOfVehicles; i++)
             {
-                bool exist = false;
-                uint mark = 0;
+                int typeNr = r.Next(0, 5);
+                int colourNr = r.Next(0, 16);
 
-                for(uint i = 0; i < types.Length; i++)
-                {
-                    if(types[i] != null)
-                    {
-                        if(types[i] == v.GetType().Name)
-                        {
-                            exist = true;
-                            break;
-                        }
-                    }
-                    else { mark = i; }      // Mark first empty place
-                }
-
-                if (!exist) { types[mark] = v.GetType().Name; }
-
+                Vehicle vehicle = MakeVehicle((uint)typeNr, (uint)colourNr);
+                bool success = garage.AddVehicle(vehicle);                      // fail if array is full
+                if (success) cnt++;
             }
-            
+
+            return cnt;                                                         // nr of successful adds
         }
 
-        private void InjectData()
+        private Vehicle? MakeVehicle(uint typeNr, uint colourNr)
         {
-            string regNum = "";
+            Vehicle? vehicle = null;
 
-            regNum = MakeRegNum();
-            Car car1 = new Car(regNum, 4, "Gasoline");
-            car1.Colour = ConsoleColor.Blue;
-            garage.AddVehicle(car1);
+            switch (typeNr)
+            {
+                case 0:
+                    vehicle = new Car(MakeRegNum(), 4, "Gasoline");
+                    vehicle.Colour = (ConsoleColor)colourNr;
+                    break;
 
-            regNum = MakeRegNum();
-            Car car2 = new Car(regNum, 4, "Diesel");
-            car2.Colour = ConsoleColor.Black;
-            garage.AddVehicle(car2);
+                case 1:
+                    vehicle = new Motorcycle(MakeRegNum(), 2, 0.82);
+                    vehicle.Colour = (ConsoleColor)colourNr;
+                    break;
 
-            regNum = MakeRegNum();
-            Motorcycle mc1 = new Motorcycle(regNum, 2, 0.6);
-            mc1.Colour = ConsoleColor.DarkBlue;
-            garage.AddVehicle(mc1);
+                case 2:
+                    vehicle = new Bus(MakeRegNum(), 6, 42);
+                    vehicle.Colour = (ConsoleColor)colourNr;
+                    break;
 
-            regNum = MakeRegNum();
-            Motorcycle mc2 = new Motorcycle(regNum, 2, 0.5);
-            mc2.Colour = ConsoleColor.DarkRed;
-            garage.AddVehicle(mc2);
+                case 3:
+                    vehicle = new Boat(MakeRegNum(), 0, 7.5);
+                    vehicle.Colour = (ConsoleColor)colourNr;
+                    break;
 
-            regNum = MakeRegNum();
-            Bus bus = new Bus(regNum, 6, 50);
-            bus.Colour = ConsoleColor.Green;
-            garage.AddVehicle(bus);
+                case 4:
+                    vehicle = new Airplane(MakeRegNum(), 3, 2);
+                    vehicle.Colour = (ConsoleColor)colourNr;
+                   break;
+            }
 
-            regNum = MakeRegNum();
-            Boat boat = new Boat(regNum, 0, 2.5);
-            boat.Colour = ConsoleColor.White;
-            garage.AddVehicle(boat);
-
-            regNum = MakeRegNum();
-            Airplane airplane = new Airplane(regNum, 3, 2);
-            airplane.Colour = ConsoleColor.White;
-            garage.AddVehicle(airplane);
+            return vehicle;
 
         }
 
@@ -270,15 +228,17 @@ namespace ConsoleApp1Garage___Övn_5
 
         }
 
-        private bool ValidateRegNum(string RegNum) //where T : class
+        internal bool ValidateRegNum(string RegNum) //where T : class
         {
-            if(string.IsNullOrWhiteSpace(RegNum) || 
-                RegNum.Length != 6 || 
-                RegNum.Contains(' ') || 
-                !int.TryParse(RegNum.Substring(3, 3), out _) ||
-                int.TryParse(RegNum.Substring(0, 1), out _) ||
+            if (string.IsNullOrWhiteSpace(RegNum) ||
+                RegNum.Length != 6 ||
+                RegNum.Contains(' ')) return false;
+
+            string s = RegNum.Substring(3, 3);
+            if (!int.TryParse(RegNum.Substring(3, 3), out _) || 
+                int.TryParse(RegNum.Substring(0, 1), out _) || 
                 int.TryParse(RegNum.Substring(1, 1), out _) ||
-                int.TryParse(RegNum.Substring(2, 1), out _) ) return false;
+                int.TryParse(RegNum.Substring(2, 1), out _)) return false;
 
             foreach (var v in garage)
                 if (v != null)
@@ -287,16 +247,16 @@ namespace ConsoleApp1Garage___Övn_5
             return true;
         }
 
-        private bool ValidateNrOfWheels(uint nrOfWheels, Vehicle vehicle)
+        internal bool ValidateNrOfWheels(uint nrOfWheels, string Type)
         {
-            switch (vehicle.GetType().Name)
+            switch (Type)
             {
                 case "Car":
                     if (nrOfWheels >= 3 && nrOfWheels <= 4) return true;
                     else return false;
 
                 case "Motorcycle":
-                    if (nrOfWheels >= 2 && nrOfWheels <= 3) return true;
+                    if (nrOfWheels >= 2 && nrOfWheels <= 4) return true;
                     else return false;
 
                 case "Bus":
@@ -313,7 +273,32 @@ namespace ConsoleApp1Garage___Övn_5
             }
 
             return true;        // if type is vehicle or new unknown, allow nr be anything
-
         }
+
+        internal bool ValidateType(string Type)
+        {
+            string[] Types = {"Car", "Motorcycle", "Bus", "Boat", "Airplane" };
+
+            if(Types.Contains(Type)) return true;
+
+            return false;
+        }
+
+        internal bool ValiateColour(string Colour, ref ConsoleColor cColour)
+        {
+            for (uint i = 0; i < 16; i++)
+            {
+                cColour = (ConsoleColor)i;
+                if (cColour.ToString() == Colour)
+                {
+                    return true;
+                }
+                
+            }
+
+            return false;
+        }
+
     }
+
 }

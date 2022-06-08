@@ -60,25 +60,6 @@ namespace ConsoleApp1Garage___Övn_5
             }
             return false;
 
-            //Vehicle? v2 = null;
-
-            //foreach (T v in vehicles)
-            //{
-            //    if (v == vehicle)
-            //    {
-            //        v2 = v;
-            //        break;
-            //    }
-            //}
-
-            //if (v2 != null)
-            //{
-            //    v2 = null;
-            //    nrOfParkedVehicles--;
-            //    return true;
-            //}
-
-            //return false;
         }
 
         public IEnumerator<T> GetEnumerator()
