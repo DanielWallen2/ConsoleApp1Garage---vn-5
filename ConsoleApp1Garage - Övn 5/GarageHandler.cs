@@ -119,16 +119,6 @@ namespace ConsoleApp1Garage___Övn_5
             if(colourOk)
                 vehicles = vehicles.Where(v => v.Colour == cColour);
 
-            //for (uint i = 0; i < 16; i++)
-            //{
-            //    myColour = (ConsoleColor)i;
-            //    if (myColour.ToString() == Colour)
-            //    {
-            //        vehicles = vehicles.Where(v => v.Colour == myColour);
-            //        break;
-            //    }
-            //}
-
             return vehicles.ToArray();
         }
 
@@ -249,25 +239,25 @@ namespace ConsoleApp1Garage___Övn_5
 
         internal bool ValidateNrOfWheels(uint nrOfWheels, string Type)
         {
-            switch (Type)
+            switch (Type.ToLower())
             {
-                case "Car":
+                case "car":
                     if (nrOfWheels >= 3 && nrOfWheels <= 4) return true;
                     else return false;
 
-                case "Motorcycle":
+                case "motorcycle":
                     if (nrOfWheels >= 2 && nrOfWheels <= 4) return true;
                     else return false;
 
-                case "Bus":
+                case "bus":
                     if (nrOfWheels >= 4 && nrOfWheels <= 6) return true;
                     else return false;
 
-                case "Boat":
+                case "boat":
                     if (nrOfWheels == 0) return true;
                     else return false;
 
-                case "Airplane":
+                case "airplane":
                     if (nrOfWheels == 3) return true;
                     else return false;
             }
@@ -277,11 +267,10 @@ namespace ConsoleApp1Garage___Övn_5
 
         internal bool ValidateType(string Type)
         {
-            string[] Types = {"Car", "Motorcycle", "Bus", "Boat", "Airplane" };
+            string[] Types = {"car", "motorcycle", "bus", "boat", "airplane" };
 
-            if(Types.Contains(Type)) return true;
-
-            return false;
+            if(Types.Contains(Type.ToLower())) return true;
+            else return false;
         }
 
         internal bool ValiateColour(string Colour, ref ConsoleColor cColour)

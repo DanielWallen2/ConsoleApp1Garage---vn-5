@@ -12,9 +12,8 @@ namespace ConsoleApp1Garage___Övn_5
             manager.Setup();
             manager.Run();
 
-            Console.WriteLine("\nThank you ...");
-            //Console.ReadKey();
-
+            Console.WriteLine("\nThank you ...\n");
+            
         }
 
     }
