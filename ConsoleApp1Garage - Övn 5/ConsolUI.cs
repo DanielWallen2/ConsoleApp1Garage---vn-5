@@ -6,101 +6,106 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1Garage___Övn_5
 {
-    internal class ConsolUI
+    public class ConsolUI : IUI
     {
-        internal void DrawSetupMessage()
+        public void DrawSetupMessage()
         {
             Console.Clear();
-            Console.WriteLine("Create garage");
+            Console.WriteLine("\n Create garage");
         }
 
-        internal void DrawMainMenu()
+        public void DrawMainMenu()
         {
             Console.Clear();
-            Console.WriteLine("Garage menu:");
+            Console.WriteLine("\n Garage menu:");
             Console.WriteLine("" +
-                "1. Populate garage\n" +
-                "2. Add a vehicle\n" +
-                "3. Remove a vehicle\n" +
-                "4. Show a vehicles properties\n" +
-                "5. List all vehicles\n" +
-                "6. Show garage statistics\n" +
-                "7. Query vehicles\n" +
-                "Q. Quit");
+                " 1. Populate garage\n" +
+                " 2. Add a vehicle\n" +
+                " 3. Remove a vehicle\n" +
+                " 4. Show a vehicles properties\n" +
+                " 5. List all vehicles\n" +
+                " 6. Show garage statistics\n" +
+                " 7. Query vehicles\n" +
+                " Q. Quit");
         }
 
-        internal string GetMenuKey()
+        public string GetMenuKey()
         {
+            Console.Write(" ");
             string key = Console.ReadKey(intercept: true).KeyChar.ToString();
             return key;
         }
 
-        internal string GetInput()
+        public string GetInput()
         {
             return Console.ReadLine();
         }
 
-        internal void ShowErrorMessage(string errorMessage) => Console.WriteLine(errorMessage);
-
-        internal void WriteMessage(string Message) => Console.WriteLine(Message);
-
-        internal void Prompt(string Message) => Console.Write(Message);
-
-        internal void DrawList(Vehicle[] vehicles)
+        public void ShowErrorMessage(string errorMessage)
         {
-            Console.WriteLine("Type        RegNum   Wheels Colour");
-            foreach(Vehicle vehicle in vehicles)
+            Console.WriteLine(errorMessage);
+            Console.Write(" ");
+        }
+
+        public void WriteMessage(string Message) => Console.WriteLine(Message);
+
+        public void Prompt(string Message) => Console.Write(Message);
+
+        public void DrawList(IVehicle[] vehicles)
+        {
+            Console.WriteLine(" Type        RegNum   Wheels Colour");
+            foreach (Vehicle vehicle in vehicles)
                 WriteVehicle(vehicle);
         }
 
-        internal void WriteVehicle(Vehicle vehicle)
+        public void WriteVehicle(IVehicle vehicle)
         {
-            string output = "" +
+            string output = " " +
                 vehicle.GetType().Name + new string(' ', 12 - vehicle.GetType().Name.Length) +
                 vehicle.RegNum + "   " +
                 vehicle.NrOfwheels + "      " +
                 vehicle.Colour;
-            
+
             Console.WriteLine(output);
         }
 
-        internal void WriteTypeCount((Type, uint)[] typeCounts)
+        public void WriteTypeCount((Type, uint)[] typeCounts)
         {
-            Console.WriteLine("\nType        Count");
+            Console.WriteLine("\n Type        Count");
 
-            string type = "";
-            uint count = 0;
-            string output = "";
+            string type;
+            uint count;
+            string output;
 
             foreach (var tc in typeCounts)
             {
                 type = tc.Item1.Name;
                 count = tc.Item2;
 
-                output = "" +
+                output = " " +
                    type + new string(' ', 12 - type.Length) +
                    count;
 
                 Console.WriteLine(output);
             }
-           
+
         }
 
-        internal void WriteCapacity(uint Capacity, uint Ocupied, uint Available)
+        public void WriteCapacity(uint Capacity, uint Ocupied, uint Available)
         {
-            string output = $"\nGarage capacity   \t {Capacity}\n" +
-                $"Number of vehicles\t {Ocupied}\n" +
-                $"Available slots   \t {Available}";
+            string output = $"\n" +
+                $" Garage capacity   \t {Capacity}\n" +
+                $" Number of vehicles\t {Ocupied}\n" +
+                $" Available slots   \t {Available}";
 
             Console.WriteLine(output);
         }
 
-        internal void Pause()
+        public void Pause()
         {
-            Console.ReadKey(intercept: true);             // Pause here
+            Console.Write(" ");
+            Console.ReadKey(intercept: true);    // Pause here
         }
-
-
     }
 
 

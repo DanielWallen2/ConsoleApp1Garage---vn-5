@@ -1,6 +1,6 @@
 ﻿namespace ConsoleApp1Garage___Övn_5
 {
-    internal interface IVehicle
+    public interface IVehicle
     {
         uint NrOfwheels { get; }
         string RegNum { get; }

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1Garage___Övn_5
 {
-   
-    internal class Garage<T> : IEnumerable<T> where T : Vehicle
+
+    public class Garage<T> : /*IEnumerable<T>,*/ IGarage<T> where T : IVehicle
     {
         private T[] vehicles;
-        
+
         private uint capacity;
         private uint nrOfParkedVehicles;
 
@@ -24,17 +24,17 @@ namespace ConsoleApp1Garage___Övn_5
             get { return nrOfParkedVehicles; }
         }
 
-        internal Garage(uint Capacity) 
+        public Garage(uint Capacity)
         {
-            capacity = Capacity; 
+            capacity = Capacity;
             vehicles = new T[Capacity];
         }
 
-        internal bool AddVehicle(T vehicle)
+        public bool AddVehicle(T vehicle)
         {
-            for(int i = 0; i < vehicles.Length; i++)
+            for (int i = 0; i < vehicles.Length; i++)
             {
-                if(vehicles[i] == null)         // Empty place
+                if (vehicles[i] == null)         // Empty place
                 {
                     vehicles[i] = vehicle;
                     nrOfParkedVehicles++;
@@ -45,15 +45,15 @@ namespace ConsoleApp1Garage___Övn_5
             return false;                       // Garage is full
         }
 
-        internal bool RemoveVehicle(T vehicle)
+        public bool RemoveVehicle(T vehicle)
         {
-            if(vehicle == null) return false;
+            if (vehicle == null) return false;
 
             for (int i = 0; i < vehicles.Length; i++)
             {
-                if (vehicles[i] == vehicle)
+                if ((IVehicle)vehicles[i] == (IVehicle)vehicle)
                 {
-                    vehicles[i] = null!;
+                    vehicles[i] = default(T);
                     nrOfParkedVehicles--;
                     return true;
                 }
@@ -66,7 +66,7 @@ namespace ConsoleApp1Garage___Övn_5
         {
             foreach (T vehicle in vehicles)
             {
-                if(vehicle != null)             // Du vill bara returnera faktiska instanser av fordon!
+                if (vehicle != null)             // Du vill bara returnera faktiska instanser av fordon!
                     yield return vehicle;
             }
         }

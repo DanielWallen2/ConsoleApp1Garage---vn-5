@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1Garage___Övn_5
 {
-    internal class Vehicle : IVehicle
+    public class Vehicle : IVehicle
     {
         private string regnum;
         private uint nrOfwheels;

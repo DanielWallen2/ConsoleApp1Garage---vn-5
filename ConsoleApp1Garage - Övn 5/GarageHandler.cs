@@ -8,7 +8,7 @@ namespace ConsoleApp1Garage___Övn_5
 {
     internal class GarageHandler
     {
-        private Garage<Vehicle> garage;
+        private IGarage<IVehicle> garage;
 
         private uint garageCapasity;
 
@@ -19,7 +19,7 @@ namespace ConsoleApp1Garage___Övn_5
 
         internal GarageHandler(uint NrOfPlaces)
         {
-            garage = new Garage<Vehicle>(NrOfPlaces);
+            garage = new Garage<IVehicle>(NrOfPlaces);
             garageCapasity = NrOfPlaces;
         }
 
@@ -88,14 +88,14 @@ namespace ConsoleApp1Garage___Övn_5
             return success;
         }
 
-        internal bool RemoveVehicle(Vehicle vehicle)
+        internal bool RemoveVehicle(IVehicle vehicle)
         {
             bool result = garage.RemoveVehicle(vehicle);
 
             return result;
         }
 
-        internal Vehicle? FindVehicle(string RegNum)
+        internal IVehicle? FindVehicle(string RegNum)
         {
             RegNum = RegNum.ToUpper();
             foreach (var v in garage)
@@ -104,11 +104,11 @@ namespace ConsoleApp1Garage___Övn_5
             return null;
         }
 
-        internal Vehicle[] FindVehicles(string VehicleType, string NrOfWheels, string Colour)
+        internal IVehicle[] FindVehicles(string VehicleType, string NrOfWheels, string Colour)
         {
-            IEnumerable<Vehicle> vehicles = garage;
+            IEnumerable<IVehicle> vehicles = (IEnumerable<IVehicle>)garage;
             if(VehicleType != "")
-                vehicles = vehicles.Where(v => v.GetType().Name == VehicleType);
+                vehicles = vehicles.Where(v => v.GetType().Name.ToLower() == VehicleType.ToLower());
 
             uint nrOfWheels;
             if(uint.TryParse(NrOfWheels, out nrOfWheels))
@@ -140,10 +140,7 @@ namespace ConsoleApp1Garage___Övn_5
             return myarray;
         }
 
-        internal Vehicle[] ListAll() 
-        {  
-            return garage.ToArray();
-        }
+        internal IVehicle[] ListAll() => garage.ToArray();
 
         private uint InjectRandomVehicles(uint NrOfVehicles)
         {
@@ -212,10 +209,9 @@ namespace ConsoleApp1Garage___Övn_5
                 for (int i = 0; i < 3; i++)
                     s += (char)r.Next(48, 58);
 
-            } while (!ValidateRegNum(s));       // If found in garage keep looping
+            } while(!ValidateRegNum(s));       // If found in garage keep looping
 
             return s;
-
         }
 
         internal bool ValidateRegNum(string RegNum) //where T : class
@@ -273,16 +269,17 @@ namespace ConsoleApp1Garage___Övn_5
             else return false;
         }
 
-        internal bool ValiateColour(string Colour, ref ConsoleColor cColour)
+        internal static bool ValiateColour(string Colour, ref ConsoleColor cColour)
         {
-            for (uint i = 0; i < 16; i++)
+            ConsoleColor consoleColor;
+            for(uint i = 0; i < 16; i++)
             {
-                cColour = (ConsoleColor)i;
-                if (cColour.ToString() == Colour)
+                consoleColor = (ConsoleColor)i;
+                if(consoleColor.ToString().ToLower() == Colour.ToLower())
                 {
+                    cColour = consoleColor;
                     return true;
                 }
-                
             }
 
             return false;

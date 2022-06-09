@@ -2,11 +2,11 @@
 {
     internal class Manager
     {
-        private ConsolUI ui;
+        private IUI ui;
         private GarageHandler gh;
         private bool running = true;
 
-        internal Manager(ConsolUI consolUi)
+        internal Manager(IUI consolUi)
         {
             ui = consolUi;
         }
@@ -14,7 +14,7 @@
         internal void Setup()
         {
             ui.DrawSetupMessage();
-            ui.Prompt("Enter how many parking slots: ");
+            ui.Prompt(" Enter how many parking slots: ");
             uint nrOfSlots =  GetGarageSize();
             gh = new GarageHandler(nrOfSlots);
         }
@@ -98,66 +98,66 @@
 
         private void ListAllVehicles()
         {
-            ui.WriteMessage("\nList of all vehicles:");
-            Vehicle[] vehicles = gh.ListAll();
+            ui.WriteMessage("\n List of all vehicles:");
+            IVehicle[] vehicles = gh.ListAll();
             ui.DrawList(vehicles);
 
         }
 
         private void ShowVehicle()
         {
-            ui.WriteMessage("\nShow a vehicles properties");
+            ui.WriteMessage("\n Show a vehicles properties");
             ui.Prompt("RegNum: ");
             string sRegNum = ui.GetInput();
-            Vehicle? vehicle = gh.FindVehicle(sRegNum);
+            IVehicle? vehicle = gh.FindVehicle(sRegNum);
             if (vehicle != null) ui.WriteVehicle(vehicle);
             else ui.ShowErrorMessage($"Could not find {sRegNum}");
         }
 
         private void RemoveAVehicle()
         {
-            ui.WriteMessage("\nRemove a vehicle");
+            ui.WriteMessage("\n Remove a vehicle");
             bool success = RemoveVehicle();
-            if (success) ui.WriteMessage("Vehicle removed");
+            if (success) ui.WriteMessage(" Vehicle removed");
         }
 
         private void AddAVehicle()
         {
-            ui.WriteMessage("\nAdd a vehicle");
+            ui.WriteMessage("\n Add a vehicle");
             bool success = AddVehicle();
-            if (success) ui.WriteMessage("Vehicle added");
-            else ui.ShowErrorMessage("Could not add vehicle");
+            if (success) ui.WriteMessage(" Vehicle added");
+            else ui.ShowErrorMessage(" Could not add vehicle");
         }
 
         private void AddRandomVehicles()
         {
-            ui.WriteMessage("\nAdd a number of random vehicles");
+            ui.WriteMessage("\n Add a number of random vehicles");
             uint size = GetPopulationSize();
             bool success = Populate(size);
-            if (success) ui.WriteMessage($"{size} vehicles added");
+            if (success) ui.WriteMessage($" {size} vehicles added");
         }
 
 
         private void QueryVehicles()
         {
-            ui.WriteMessage("\nQuery vehicles");
+            ui.WriteMessage("\n Query vehicles");
 
-            ui.Prompt("Type: ");
+            ui.Prompt(" Type: ");
             string type = ui.GetInput();
 
-            ui.Prompt("Nr of wheels: ");
+            ui.Prompt(" Nr of wheels: ");
             string wheels = ui.GetInput();
 
-            ui.Prompt("Colour: ");
+            ui.Prompt(" Colour: ");
             string colour = ui.GetInput();
 
-            Vehicle[] vehicles = gh.FindVehicles(type, wheels, colour);
+            IVehicle[] vehicles = gh.FindVehicles(type, wheels, colour);
             ui.DrawList(vehicles);
         }
 
         private void ShowStatistics()
         {
-            ui.WriteMessage("\nShow garage statistics:");
+            ui.WriteMessage("\n Show garage statistics:");
 
             uint capacity = gh.GarageCapacity;
             uint ocupied = gh.CountVehicles();
@@ -171,70 +171,76 @@
 
         private bool RemoveVehicle()
         {
-            string sRegNum = "";
+            string sRegNum;
             bool success = false;
 
-            ui.Prompt("RegNum: ");
+            ui.Prompt(" RegNum: ");
             sRegNum = ui.GetInput();
-            Vehicle? vehicle = gh.FindVehicle(sRegNum);
+            IVehicle? vehicle = gh.FindVehicle(sRegNum);
             if(vehicle != null) success = gh.RemoveVehicle(vehicle);
-            else ui.ShowErrorMessage($"Could not find {sRegNum}");
+            else ui.ShowErrorMessage($" Could not find {sRegNum}");
 
             return success;
         }
 
         private bool AddVehicle()
         {
-            ui.Prompt("Vehicle type: ");
-            string sType = "";
-            bool typeOk = false;
+            ui.Prompt(" Vehicle type: ");
+            string sType;
+            bool typeOk;
             do
             {
                 sType = ui.GetInput();
                 typeOk = gh.ValidateType(sType);
-                if (!typeOk) { ui.ShowErrorMessage("Wrong input!"); }
+                if (!typeOk) { ui.ShowErrorMessage(" Wrong input!"); }
 
             } while(!typeOk);
 
-            ui.Prompt("RegNum: ");
-            string sRegNum = "";
-            bool regNumOk = false;
+            ui.Prompt(" RegNum: ");
+            string sRegNum;
+            bool regNumOk;
             do
             {
                 sRegNum = ui.GetInput().ToUpper();
                 regNumOk = gh.ValidateRegNum(sRegNum);   
-                if(!regNumOk) { ui.ShowErrorMessage("Wrong input!"); }
+                if(!regNumOk) { ui.ShowErrorMessage(" Wrong input!"); }
 
             } while(!regNumOk);
 
-            ui.Prompt("How many wheels: ");
-            uint nrOfWheels = 0;
-            bool success = false;
+            ui.Prompt(" How many wheels: ");
+            uint nrOfWheels;
+            bool wheelsOK;
             do
             {
                 string sNrOfWheels = ui.GetInput();
-                success = uint.TryParse(sNrOfWheels, out nrOfWheels);
-                if (success) { success = gh.ValidateNrOfWheels(nrOfWheels, sType); }
-                if (!success) { ui.ShowErrorMessage("Wrong input!"); }
+                wheelsOK = uint.TryParse(sNrOfWheels, out nrOfWheels);
+                if (wheelsOK) { wheelsOK = gh.ValidateNrOfWheels(nrOfWheels, sType); }
+                if (!wheelsOK) { ui.ShowErrorMessage(" Wrong input!"); }
 
-            } while (!success);
+            } while (!wheelsOK);
 
-            ui.Prompt("Colour: ");
+            ui.Prompt(" Colour: ");
             ConsoleColor cColour = ConsoleColor.Black;
-            string sColour = ui.GetInput();
-            if(sColour != "") gh.ValiateColour(sColour, ref cColour);       // Set cColour if input is valid
+            bool colourOK;
+            do
+            {
+                string sColour = ui.GetInput();
+                if (sColour == "") colourOK = true;
+                else colourOK = GarageHandler.ValiateColour(sColour, ref cColour);       // Set cColour if input is valid
 
-            success = false;
+            } while(!colourOK);
+
+            bool success = false;
             switch (sType.ToLower())
             {
                 case "car":
-                    ui.Prompt("Fuel type: ");
+                    ui.Prompt(" Fuel type: ");
                     string sFuelType = ui.GetInput();
                     success = gh.AddCar(sRegNum, nrOfWheels, sFuelType, cColour);
                     break;
 
                 case "motorcycle":
-                    ui.Prompt("Cylinder volume: ");
+                    ui.Prompt(" Cylinder volume: ");
                     double cylinderVolume = 0.8;
                     string sCylinderVolume = ui.GetInput();
                     success = double.TryParse(sCylinderVolume, out cylinderVolume);
@@ -242,7 +248,7 @@
                     break;
 
                 case "bus":
-                    ui.Prompt("Number of seats: ");
+                    ui.Prompt(" Number of seats: ");
                     uint nrOfSeats = 0;
                     string sNrOfSeats = ui.GetInput();
                     success = uint.TryParse(sNrOfSeats, out nrOfSeats);
@@ -250,7 +256,7 @@
                     break;
 
                 case "boat":
-                    ui.Prompt("Length: ");
+                    ui.Prompt(" Length: ");
                     double length = 0;
                     string sLength = ui.GetInput();
                     success = double.TryParse(sLength, out length);
@@ -258,7 +264,7 @@
                     break;
 
                 case "airplane":
-                    ui.Prompt("Number of engines: ");
+                    ui.Prompt(" Number of engines: ");
                     uint nrOfEngines = 0;
                     string sNrOfEngines = ui.GetInput();
                     success = uint.TryParse(sNrOfEngines, out nrOfEngines);
@@ -275,23 +281,19 @@
             bool success = false;
             string errMsg = "";
 
-            ui.Prompt("How many vehicles? ");
+            ui.Prompt(" How many vehicles? ");
             do
             {
                 string sSize = ui.GetInput();
                 success = uint.TryParse(sSize, out size);
                 if (!success) errMsg = "Input must be a number";
-                if (success && (size == 0))
-                {
-                    errMsg = "Size must be grater than 0";
-                    success = false;
-                }
+                if (success && (size == 0)) { errMsg = "Size must be grater than 0"; success = false; }
                 if (success && (size > gh.GarageCapacity))
                 {
                     errMsg = $"Size must not be grater than garage capacity ({gh.GarageCapacity})";
                     success = false;
                 } 
-                if (!success) ui.ShowErrorMessage("Wrong input! " + errMsg);
+                if (!success) ui.ShowErrorMessage(" Wrong input! " + errMsg);
 
             } while (!success);
 
@@ -300,28 +302,30 @@
 
         private bool Populate(uint nrOfVehicles)
         {
-            uint nrAdded = 0;
+            uint nrAdded;
             nrAdded = gh.Populate(nrOfVehicles);
-            if(nrAdded < nrOfVehicles) ui.ShowErrorMessage($"{nrAdded} vehicles added. Garage is Full.");
+            if(nrAdded < nrOfVehicles) ui.ShowErrorMessage($" {nrAdded} vehicles added. Garage is full.");
 
             return nrAdded == nrOfVehicles;
         }
 
         private string GetMenuChoise()
         {
-            string sKey = "";
+            string sKey;
+            string errMsg = "";
+            bool success;
 
-            bool succes = false;
             do
             {
                 sKey = ui.GetMenuKey();
                 if (sKey.ToUpper() == "Q") return sKey.ToUpper();
-                uint result = 0; 
-                succes = uint.TryParse(sKey.ToString(), out result);            // Check if numerical
-                if (succes && (result == 0 || result > 7)) succes = false;      // Check if outside the menu
-                if (!succes) ui.ShowErrorMessage("Wrong input!");
+                success = uint.TryParse(sKey.ToString(), out uint result);                                  // Check if numerical
+                if (!success) errMsg = "Key must be a number";
+                if (success && (result == 0)) { success = false; errMsg = "Key can not be 0"; }             // Check if 0
+                if (success && (result > 7)) { success = false; errMsg = "Key can not be more than 7"; }    // Check if outside the menu
+                if (!success) ui.ShowErrorMessage(" Wrong input! " + errMsg);
 
-            } while (!succes);
+            } while (!success);
 
             return sKey;
         }
@@ -329,15 +333,19 @@
         private uint GetGarageSize()
         {
             uint size = 0;
-            bool succes = false;
+            string errMsg = "";
+            bool success = false;
+
             do
             {
                 string sSize = ui.GetInput();
-                succes = uint.TryParse(sSize, out size);
-                if(succes && (size == 0 || size > 100)) succes = false;
-                if(!succes) ui.ShowErrorMessage("Wrong input!");
+                success = uint.TryParse(sSize, out size);
+                if (!success) errMsg = "Input must be numerical";
+                if (success && (size == 0)) { success = false; errMsg = "Size can not be 0"; }
+                if (success && (size > 100)) { success = false; errMsg = "Size can not be more than 100"; }
+                if(!success) ui.ShowErrorMessage(" Wrong input! " + errMsg);
 
-            } while (!succes);
+            } while (!success);
 
             return size;
         }
