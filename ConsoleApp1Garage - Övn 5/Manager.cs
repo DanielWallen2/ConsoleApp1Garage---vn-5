@@ -44,7 +44,7 @@ namespace ConsoleApp1Garage___Övn_5
                     {
                         case "car":
                             
-                            Car car = new Car();
+                            //Car car = new Car();
                             break;
                     }
 
