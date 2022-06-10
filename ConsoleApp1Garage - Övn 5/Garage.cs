@@ -11,9 +11,10 @@ namespace ConsoleApp1Garage___Övn_5
     public class Garage<T> : /*IEnumerable<T>,*/ IGarage<T> where T : IVehicle
     {
         private T[] vehicles;
-
         private uint capacity;
         private uint nrOfParkedVehicles;
+        private bool isEmpty;
+        private bool isFull;
 
         public uint Capacity
         {
@@ -23,21 +24,37 @@ namespace ConsoleApp1Garage___Övn_5
         {
             get { return nrOfParkedVehicles; }
         }
+        public bool IsEmpty
+        {
+            get { return isEmpty; }
+        }
+        public bool IsFull
+        {
+            get { return isFull; }
+        }
 
         public Garage(uint Capacity)
         {
             capacity = Capacity;
             vehicles = new T[Capacity];
+            isEmpty = true;
+            isFull = false;
         }
 
         public bool AddVehicle(T vehicle)
         {
+            if (vehicle == null) return false;
+            else
+                foreach(var v in vehicles)
+                    if ((IVehicle)v == (IVehicle)vehicle) return false;
+
             for (int i = 0; i < vehicles.Length; i++)
             {
                 if (vehicles[i] == null)         // Empty place
                 {
                     vehicles[i] = vehicle;
                     nrOfParkedVehicles++;
+                    isFull = (nrOfParkedVehicles == capacity);
                     return true;
                 }
             }
@@ -55,11 +72,12 @@ namespace ConsoleApp1Garage___Övn_5
                 {
                     vehicles[i] = default(T);
                     nrOfParkedVehicles--;
+                    isEmpty = (nrOfParkedVehicles == 0);
                     return true;
                 }
             }
-            return false;
 
+            return false;
         }
 
         public IEnumerator<T> GetEnumerator()

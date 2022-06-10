@@ -13,7 +13,7 @@ namespace ConsoleApp1Garage___Övn_5
             manager.Run();
 
             Console.WriteLine("\n Thank you ...\n");
-            
+
         }
 
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,30 @@ namespace ConsoleApp1Garage___Övn_5
             garage = new Garage<IVehicle>(NrOfPlaces);
             garageCapasity = NrOfPlaces;
         }
+
+        internal bool SaveGarage(string path)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach(var vehicle in garage)
+            {
+                sb.Append($"Type:{vehicle.GetType().Name};");
+
+                foreach (PropertyInfo p in vehicle.GetType().GetProperties())
+                    sb.Append($"{p.Name}:{p.GetValue(vehicle, null)};");
+
+                sb.Append(Environment.NewLine);
+            }
+
+            File.WriteAllText(path, sb.ToString());
+
+            return true;
+        }
+
+
+
+
 
         internal uint Populate(uint nrOfVehicles)
         {

@@ -1,10 +1,16 @@
-﻿namespace ConsoleApp1Garage___Övn_5
+﻿using System.Reflection;
+
+namespace ConsoleApp1Garage___Övn_5
 {
     internal class Manager
     {
         private IUI ui;
         private GarageHandler gh;
         private bool running = true;
+
+        private string garageDirectory;
+        private string garageFile = "MyGarage";
+        private string path;
 
         internal Manager(IUI consolUi)
         {
@@ -13,9 +19,52 @@
 
         internal void Setup()
         {
+            garageDirectory = Environment.CurrentDirectory;
+            path = @$"{garageDirectory}\{garageFile}";
+
+            bool fileExist = File.Exists(path);
+
+            if (fileExist)
+            {
+                string[] sVehicles = File.ReadAllLines(path);
+
+                for(int i = 0; i < sVehicles.Length; i++)
+                {
+                    string[] sVehicle = sVehicles[i].Split(';');
+
+                    string[] prop;
+                    string sType = "";
+                    for (int j = 0; j < sVehicle.Length - 1; j++)
+                    {
+                        prop = sVehicle[j].Split(':');
+                        if (j == 0) sType = prop[1];
+                    }
+                    
+                    switch (sType)
+                    {
+                        case "car":
+                            
+                            Car car = new Car();
+                            break;
+                    }
+
+                }
+            }
+            else
+            {
+                if(!Directory.Exists(garageDirectory))
+                    Directory.CreateDirectory(garageDirectory);
+
+                MakeGarage();
+            }
+
+        }
+
+        private void MakeGarage()
+        {
             ui.DrawSetupMessage();
             ui.Prompt(" Enter how many parking slots: ");
-            uint nrOfSlots =  GetGarageSize();
+            uint nrOfSlots = GetGarageSize();
             gh = new GarageHandler(nrOfSlots);
         }
 
@@ -92,6 +141,8 @@
 
         private void Quit()
         {
+            gh.SaveGarage(path);
+
             running = false;
             //Environment.Exit(0);
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1Garage___Övn_5
 {
-    internal class Car : Vehicle
+    public class Car : Vehicle
     {
         private string fuelType;
 
@@ -15,7 +15,7 @@ namespace ConsoleApp1Garage___Övn_5
             get { return fuelType; }
         }
 
-        internal Car(string RegNum, uint NrOfwheels, string FuelType) : base(RegNum, NrOfwheels)
+        public Car(string RegNum, uint NrOfwheels, string FuelType) : base(RegNum, NrOfwheels)
         {
             fuelType = FuelType;
         }

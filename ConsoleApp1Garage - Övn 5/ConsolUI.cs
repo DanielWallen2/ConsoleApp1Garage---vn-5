@@ -36,10 +36,7 @@ namespace ConsoleApp1Garage___Övn_5
             return key;
         }
 
-        public string GetInput()
-        {
-            return Console.ReadLine();
-        }
+        public string GetInput() => Console.ReadLine();
 
         public void ShowErrorMessage(string errorMessage)
         {
