@@ -9,7 +9,7 @@ namespace ConsoleApp1Garage___Övn_5
         string GetInput();
         string GetMenuKey();
         void Pause();
-        void Prompt(string Message);
+        string Prompt(string Message);
         void ShowErrorMessage(string errorMessage);
         void WriteCapacity(uint Capacity, uint Ocupied, uint Available);
         void WriteMessage(string Message);

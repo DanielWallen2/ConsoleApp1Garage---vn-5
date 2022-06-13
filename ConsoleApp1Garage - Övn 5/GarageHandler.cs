@@ -24,24 +24,23 @@ namespace ConsoleApp1Garage___Övn_5
             garageCapasity = NrOfPlaces;
         }
 
-        internal bool SaveGarage(string path)
+        internal void SaveGarage(string path)
         {
-
             StringBuilder sb = new StringBuilder();
 
-            foreach(var vehicle in garage)
+            sb.Append($"Size:{garage.Capacity};");
+            sb.Append(Environment.NewLine);
+
+            foreach (var vehicle in garage)
             {
                 sb.Append($"Type:{vehicle.GetType().Name};");
 
-                foreach (PropertyInfo p in vehicle.GetType().GetProperties())
+                foreach(PropertyInfo p in vehicle.GetType().GetProperties())
                     sb.Append($"{p.Name}:{p.GetValue(vehicle, null)};");
 
                 sb.Append(Environment.NewLine);
             }
-
             File.WriteAllText(path, sb.ToString());
-
-            return true;
         }
 
 
@@ -112,11 +111,16 @@ namespace ConsoleApp1Garage___Övn_5
 
             return success;
         }
+        
+        internal bool AddVehicle(IVehicle vehicle)
+        {
+            bool result = garage.AddVehicle(vehicle);
+            return result;
+        }
 
         internal bool RemoveVehicle(IVehicle vehicle)
         {
             bool result = garage.RemoveVehicle(vehicle);
-
             return result;
         }
 

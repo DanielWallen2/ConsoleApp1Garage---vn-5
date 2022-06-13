@@ -17,7 +17,8 @@ namespace ConsoleApp1Garage___Övn_5
         public void DrawMainMenu()
         {
             Console.Clear();
-            Console.WriteLine("\n Garage menu:");
+            Console.WriteLine("\n Garage menu:\n" +
+                " -----------------------------");
             Console.WriteLine("" +
                 " 1. Populate garage\n" +
                 " 2. Add a vehicle\n" +
@@ -46,11 +47,16 @@ namespace ConsoleApp1Garage___Övn_5
 
         public void WriteMessage(string Message) => Console.WriteLine(Message);
 
-        public void Prompt(string Message) => Console.Write(Message);
+        public string Prompt(string Message)
+        {
+            Console.Write(Message);
+            return GetInput();
+        }
 
         public void DrawList(IVehicle[] vehicles)
         {
-            Console.WriteLine(" Type        RegNum   Wheels Colour");
+            Console.WriteLine(" Type        RegNum   Wheels Colour\n" +
+                              " ----------------------------------");
             foreach (Vehicle vehicle in vehicles)
                 WriteVehicle(vehicle);
         }
@@ -68,7 +74,8 @@ namespace ConsoleApp1Garage___Övn_5
 
         public void WriteTypeCount((Type, uint)[] typeCounts)
         {
-            Console.WriteLine("\n Type        Count");
+            Console.WriteLine("\n Type        Count\n" +
+                                " -----------------");
 
             string type;
             uint count;

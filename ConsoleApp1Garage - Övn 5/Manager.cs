@@ -23,30 +23,36 @@ namespace ConsoleApp1Garage___Övn_5
             path = @$"{garageDirectory}\{garageFile}";
 
             bool fileExist = File.Exists(path);
-
+            // ToDo: Check if file is empty
+            
             if (fileExist)
             {
                 string[] sVehicles = File.ReadAllLines(path);
 
-                for(int i = 0; i < sVehicles.Length; i++)
+                string[] sv = sVehicles[0].Split(';');
+                string[] p = sv[0].Split(':');
+                uint size;
+                bool ok = uint.TryParse(p[1], out size);
+
+                gh = new GarageHandler(size);
+
+                for (int i = 0; i < sVehicles.Length; i++)
                 {
                     string[] sVehicle = sVehicles[i].Split(';');
 
                     string[] prop;
-                    string sType = "";
+                    string[] pKey = {"", "", "", "", ""}; 
+                    string[] pValue = { "", "", "", "", ""};
                     for (int j = 0; j < sVehicle.Length - 1; j++)
                     {
                         prop = sVehicle[j].Split(':');
-                        if (j == 0) sType = prop[1];
+                        pKey[j] = prop[0];
+                        pValue[j] = prop[1];
                     }
-                    
-                    switch (sType)
-                    {
-                        case "car":
-                            
-                            //Car car = new Car();
-                            break;
-                    }
+
+                    Vehicle? vehicle = CreateSpecificVehicle(pValue);
+                    if(vehicle != null)
+                        gh.AddVehicle(vehicle);
 
                 }
             }
@@ -58,6 +64,76 @@ namespace ConsoleApp1Garage___Övn_5
                 MakeGarage();
             }
 
+        }
+
+        private Vehicle? CreateSpecificVehicle(string[] PropertyValue)
+        {
+            uint nrOfWheels;
+            ConsoleColor colour;
+
+            switch (PropertyValue[0])
+            {
+                case "Car":
+                    uint.TryParse(PropertyValue[3], out nrOfWheels);
+                    colour = ParseColour(PropertyValue[4]);
+                    Car car = new Car(PropertyValue[2], nrOfWheels, PropertyValue[1]);
+                    car.Colour = colour;
+                    return car;
+
+                case "Motorcycle":
+                    uint.TryParse(PropertyValue[3], out nrOfWheels);
+                    colour = ParseColour(PropertyValue[4]);
+                    double cylinderVolume;
+                    double.TryParse(PropertyValue[1], out cylinderVolume);
+                    Motorcycle mc = new Motorcycle(PropertyValue[2], nrOfWheels, cylinderVolume);
+                    mc.Colour = colour;
+                    return mc;
+
+                case "Bus":
+                    uint.TryParse(PropertyValue[3], out nrOfWheels);
+                    colour = ParseColour(PropertyValue[4]);
+                    uint nrOfSeats;
+                    uint.TryParse(PropertyValue[1], out nrOfSeats);
+                    Bus bus = new Bus(PropertyValue[2], nrOfWheels, nrOfSeats);
+                    bus.Colour = colour;
+                    return bus;
+
+                case "Boat":
+                    uint.TryParse(PropertyValue[3], out nrOfWheels);
+                    colour = ParseColour(PropertyValue[4]);
+                    double length;
+                    double.TryParse(PropertyValue[1], out length);
+                    Boat boat = new Boat(PropertyValue[2], nrOfWheels, length);
+                    boat.Colour = colour;
+                    return boat;
+
+                case "Airplane":
+                    uint.TryParse(PropertyValue[3], out nrOfWheels);
+                    colour = ParseColour(PropertyValue[4]);
+                    uint nrOfEngines;
+                    uint.TryParse(PropertyValue[1], out nrOfEngines);
+                    Airplane airplane = new Airplane(PropertyValue[2], nrOfWheels, nrOfEngines);
+                    airplane.Colour = colour;
+                    return airplane;
+
+                default:
+                    return null;
+
+            }
+        }
+
+        private ConsoleColor ParseColour(string Colour)
+        {
+            ConsoleColor colour = ConsoleColor.Black;
+
+            for (int j = 0; j < 16; j++)
+            {
+                colour = (ConsoleColor)j;
+                string sColour = colour.ToString();
+                if (sColour == Colour) break;
+            }
+
+            return colour;
         }
 
         private void MakeGarage()
@@ -98,53 +174,13 @@ namespace ConsoleApp1Garage___Övn_5
 
             if(menu.ContainsKey(choise)) menu[choise]?.Invoke();
 
-
-            //switch (choise)
-            //{
-            //    case "1":
-            //        AddRandomVehicles();
-            //        break;
-
-            //    case "2":
-            //        AddAVehicle();
-            //        break;
-
-            //    case "3":
-            //        RemoveAVehicle();
-            //        break;
-
-            //    case "4":
-            //        ShowVehicle();
-            //        break;
-
-            //    case "5":
-            //        ListAllVehicles();
-            //        break;
-
-            //    case "6":
-            //        ShowStatistics();
-            //        break;
-
-            //    case "7":
-            //        QueryVehicles();
-            //        break;
-
-            //    case "Q":
-            //        Quit();
-            //        break;
-
-            //    default:
-            //        break;
-            //}
-
         }
 
         private void Quit()
         {
-            gh.SaveGarage(path);
-
-            running = false;
             //Environment.Exit(0);
+            gh.SaveGarage(path);
+            running = false;
         }
 
         private void ListAllVehicles()
@@ -152,7 +188,6 @@ namespace ConsoleApp1Garage___Övn_5
             ui.WriteMessage("\n List of all vehicles:");
             IVehicle[] vehicles = gh.ListAll();
             ui.DrawList(vehicles);
-
         }
 
         private void ShowVehicle()
@@ -208,7 +243,8 @@ namespace ConsoleApp1Garage___Övn_5
 
         private void ShowStatistics()
         {
-            ui.WriteMessage("\n Show garage statistics:");
+            ui.WriteMessage("\n Show garage statistics:\n" +
+                              " -----------------------");
 
             uint capacity = gh.GarageCapacity;
             uint ocupied = gh.CountVehicles();
@@ -236,46 +272,42 @@ namespace ConsoleApp1Garage___Övn_5
 
         private bool AddVehicle()
         {
-            ui.Prompt(" Vehicle type: ");
             string sType;
             bool typeOk;
             do
             {
-                sType = ui.GetInput();
+                sType = ui.Prompt(" Vehicle type: ");
                 typeOk = gh.ValidateType(sType);
                 if (!typeOk) { ui.ShowErrorMessage(" Wrong input!"); }
 
             } while(!typeOk);
-
-            ui.Prompt(" RegNum: ");
+            
             string sRegNum;
             bool regNumOk;
             do
             {
-                sRegNum = ui.GetInput().ToUpper();
+                sRegNum = ui.Prompt(" RegNum: ").ToUpper();
                 regNumOk = gh.ValidateRegNum(sRegNum);   
                 if(!regNumOk) { ui.ShowErrorMessage(" Wrong input!"); }
 
             } while(!regNumOk);
 
-            ui.Prompt(" How many wheels: ");
             uint nrOfWheels;
             bool wheelsOK;
             do
             {
-                string sNrOfWheels = ui.GetInput();
+                string sNrOfWheels = ui.Prompt(" How many wheels: ");
                 wheelsOK = uint.TryParse(sNrOfWheels, out nrOfWheels);
                 if (wheelsOK) { wheelsOK = gh.ValidateNrOfWheels(nrOfWheels, sType); }
                 if (!wheelsOK) { ui.ShowErrorMessage(" Wrong input!"); }
 
             } while (!wheelsOK);
-
-            ui.Prompt(" Colour: ");
+            
             ConsoleColor cColour = ConsoleColor.Black;
             bool colourOK;
             do
             {
-                string sColour = ui.GetInput();
+                string sColour = ui.Prompt(" Colour: ");
                 if (sColour == "") colourOK = true;
                 else colourOK = GarageHandler.ValiateColour(sColour, ref cColour);       // Set cColour if input is valid
 
@@ -285,39 +317,34 @@ namespace ConsoleApp1Garage___Övn_5
             switch (sType.ToLower())
             {
                 case "car":
-                    ui.Prompt(" Fuel type: ");
-                    string sFuelType = ui.GetInput();
+                    string sFuelType = ui.Prompt(" Fuel type: ");
                     success = gh.AddCar(sRegNum, nrOfWheels, sFuelType, cColour);
                     break;
 
                 case "motorcycle":
-                    ui.Prompt(" Cylinder volume: ");
-                    double cylinderVolume = 0.8;
-                    string sCylinderVolume = ui.GetInput();
+                    string sCylinderVolume = ui.Prompt(" Cylinder volume: ");
+                    double cylinderVolume;
                     success = double.TryParse(sCylinderVolume, out cylinderVolume);
                     if (success) success = gh.AddMotorcycle(sRegNum, nrOfWheels, cylinderVolume, cColour);
                     break;
 
                 case "bus":
-                    ui.Prompt(" Number of seats: ");
-                    uint nrOfSeats = 0;
-                    string sNrOfSeats = ui.GetInput();
+                    string sNrOfSeats = ui.Prompt(" Number of seats: ");
+                    uint nrOfSeats;
                     success = uint.TryParse(sNrOfSeats, out nrOfSeats);
                     if(success) success = gh.AddBus(sRegNum, nrOfWheels, nrOfSeats, cColour);
                     break;
 
                 case "boat":
-                    ui.Prompt(" Length: ");
-                    double length = 0;
-                    string sLength = ui.GetInput();
+                    string sLength = ui.Prompt(" Length: ");
+                    double length;
                     success = double.TryParse(sLength, out length);
                     if(success) success = gh.AddBoat(sRegNum, nrOfWheels, length, cColour);
                     break;
 
                 case "airplane":
-                    ui.Prompt(" Number of engines: ");
+                    string sNrOfEngines = ui.Prompt(" Number of engines: ");
                     uint nrOfEngines = 0;
-                    string sNrOfEngines = ui.GetInput();
                     success = uint.TryParse(sNrOfEngines, out nrOfEngines);
                     if(success) success = gh.AddAirplane(sRegNum, nrOfWheels, nrOfEngines, cColour);
                     break;
