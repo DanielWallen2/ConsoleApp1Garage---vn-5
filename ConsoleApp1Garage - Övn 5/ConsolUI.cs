@@ -18,8 +18,7 @@ namespace ConsoleApp1Garage___Övn_5
         {
             Console.Clear();
             Console.WriteLine("\n Garage menu:\n" +
-                " -----------------------------");
-            Console.WriteLine("" +
+                " -----------------------------\n" +
                 " 1. Populate garage\n" +
                 " 2. Add a vehicle\n" +
                 " 3. Remove a vehicle\n" +
@@ -37,8 +36,6 @@ namespace ConsoleApp1Garage___Övn_5
             return key;
         }
 
-        public string GetInput() => Console.ReadLine();
-
         public void ShowErrorMessage(string errorMessage)
         {
             Console.WriteLine(errorMessage);
@@ -50,7 +47,7 @@ namespace ConsoleApp1Garage___Övn_5
         public string Prompt(string Message)
         {
             Console.Write(Message);
-            return GetInput();
+            return Console.ReadLine();
         }
 
         public void DrawList(IVehicle[] vehicles)
@@ -97,10 +94,9 @@ namespace ConsoleApp1Garage___Övn_5
 
         public void WriteCapacity(uint Capacity, uint Ocupied, uint Available)
         {
-            string output = $"\n" +
-                $" Garage capacity   \t {Capacity}\n" +
-                $" Number of vehicles\t {Ocupied}\n" +
-                $" Available slots   \t {Available}";
+            string output = $" Garage capacity   \t {Capacity}\n" +
+                            $" Number of vehicles\t {Ocupied}\n" +
+                            $" Available slots   \t {Available}";
 
             Console.WriteLine(output);
         }

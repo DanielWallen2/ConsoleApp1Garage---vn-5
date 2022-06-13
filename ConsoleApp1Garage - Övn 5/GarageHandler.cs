@@ -10,7 +10,6 @@ namespace ConsoleApp1Garage___Övn_5
     internal class GarageHandler
     {
         private IGarage<IVehicle> garage;
-
         private uint garageCapasity;
 
         public uint GarageCapacity
@@ -42,10 +41,6 @@ namespace ConsoleApp1Garage___Övn_5
             }
             File.WriteAllText(path, sb.ToString());
         }
-
-
-
-
 
         internal uint Populate(uint nrOfVehicles)
         {
@@ -193,7 +188,7 @@ namespace ConsoleApp1Garage___Övn_5
         {
             Vehicle? vehicle = null;
 
-            switch (typeNr)
+            switch(typeNr)
             {
                 case 0:
                     vehicle = new Car(MakeRegNum(), 4, "Gasoline");

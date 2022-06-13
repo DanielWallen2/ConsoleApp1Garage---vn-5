@@ -6,7 +6,6 @@ namespace ConsoleApp1Garage___Övn_5
         void DrawList(IVehicle[] vehicles);
         void DrawMainMenu();
         void DrawSetupMessage();
-        string GetInput();
         string GetMenuKey();
         void Pause();
         string Prompt(string Message);
